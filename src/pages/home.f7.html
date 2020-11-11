@@ -4,8 +4,8 @@
     <div class="navbar navbar-large">
       <div class="navbar-bg"></div>
       <div class="navbar-inner">
-        
         <div class="title sliding">F7CoreTest</div>
+
         <div class="title-large">
           <div class="title-large-text">F7CoreTest</div>
         </div>
@@ -14,11 +14,159 @@
     <!-- Scrollable page content-->
     <div class="page-content">
       <div class="block block-strong">
-        <p>Here is your blank Framework7 app. Let's see what we have here.</p>
+        <p>App FWK7-Core (Pure javascript) and Webpack</p>
+        <p>Proof of Concept <b>@pqina/flip</b></p>
+      </div>
+      <div class="block block-strong block-tick-container">
+          <div class="stepper stepper-raised stepper-large stepper-fill stepper-init">
+              <div class="stepper-button-minus"></div>
+              <div class="stepper-input-wrap">
+                <input type="text" value="{{this.tickTimeSelected}}" @change="onChangeStepperValue" min="0" max="120" step="1" readonly>
+              </div>
+              <div class="stepper-button-plus"></div>
+            </div>
+
+          <div id="clock-tick-anti-entradera" class="tick">
+
+              <div data-repeat="false" data-layout="horizontal fit">
+    
+                <span data-key="minutes" data-transform="pad(00)" data-view="flip"></span>
+    
+                <span data-view="text" data-key="sep" class="tick-text-inline">:</span>
+    
+                <span data-key="seconds" data-transform="pad(00)" data-view="flip"></span>
+    
+              </div>
+    
+            </div>
+    
+            <button @click="onClickStart" class="button button-raised button-fill">Start</button>
+            <button @click="onClickPause" class="button button-raised button-fill color-red">Stop & Restart</button>
+          </div>
       </div>
     </div>
   </div>
 </template>
 <script>
-export default {}
+  import Tick from '@pqina/flip';
+  import "@pqina/flip/dist/flip.min.css";
+
+
+  export default {
+    data: function () {
+      return {
+        //Countdown clock
+        tickClock: null,
+        tickCountDown: null,
+        tickTimeSelected: 30,
+      }
+    },
+    on: {
+      pageInit: function () {
+        //this.initializeStepper();
+        this.initializeCountDown();
+      }
+    },
+    methods: {
+      initializeCountDown() {
+        let self = this;
+        console.log('Tick', Tick);
+
+        // create a ticker on an element with options
+        var element = document.querySelector('#clock-tick-anti-entradera');
+        self.tickClock = Tick.DOM.create(element, {
+          value: "00",
+          credits: false, //Deshabilito que se muestren los créditos del desarrollador
+          didInit: function (tick) {
+            self.handleTickInitDown(tick);
+          }
+        });
+      },
+      handleTickInitDown(tick) {
+        let self = this;
+        // get timer offset (if not found, set to today)
+        var offset = new Date();
+
+        // time in hours the timer will run down
+        var timeDuration = Tick.helper.duration(self.tickTimeSelected, 'minutes');
+
+        // add time selected to get final deadline
+        var deadline = new Date(offset.setMilliseconds(offset.getMilliseconds() + timeDuration));
+
+        // create counter
+        self.tickCountDown = Tick.count.down(deadline, {
+          format: ['m', 's']
+        });
+
+        console.log('tickCountDown', self.tickCountDown);
+
+        // update tick with the counter value
+        self.tickCountDown.onupdate = function (value) {
+          console.log(value[0],value[1]);
+          console.log(tick.value);
+          tick.value = value;
+        };
+
+        self.tickCountDown.onended = function () {
+          console.lo("FIN!");
+          // redirect, uncomment the next line
+          // window.location = 'my-location.html'
+
+          // hide counter, uncomment the next line
+          // tick.root.style.display = 'none';
+
+          // show message, uncomment the next line
+          // document.querySelector('.tick-onended-message').style.display = '';
+        };
+      },
+      onClickStart() {
+        this.tickCountDown.timer.start();
+      },
+      onClickPause() {
+        //Stop and set to tickTimeSelected clock
+        this.tickCountDown.timer.pause();
+        console.log(this.tickCountDown.value);
+      },
+      updateCountDownValue() {
+        //this.tickCountDown.timer.update(this.tickTimeSelected);
+      },
+      onChangeStepperValue (e) {
+        console.log('onChangeStepperValue', e.target.value);
+        this.tickTimeSelected = e.target.value;
+        this.updateCountDownValue();
+      },
+      initializeStepper() {
+        let self = this;
+
+        var stepper = app.stepper.create({
+          el: '.stepper',
+          max: 120,
+          min: 0,
+          value: self.tickTimeSelected,
+          on: {
+            change: function () {
+              console.log(stepper.getValue());
+              console.log('Stepper value changed')
+            }
+          }
+        });
+      }
+    }
+  };
 </script>
+
+<style scoped>
+  .block-tick-container {
+    text-align: center;
+  }
+  .tick {
+    max-width: 400px;
+    margin-bottom: 20px;
+  }
+
+  .button.button-raised {
+    margin: 15px;
+  }
+
+
+</style>
