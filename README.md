@@ -1,12 +1,17 @@
 # F7CoreTest
 
+## Getting started
+* Clone repo `git clone https://github.com/fgarcia5/f7-core-test`
+* Into root folder run `npm install`
+* Run the project doing `npm run dev`
+
 ## Framework7 CLI Options
 
 Framework7 app created with following options:
 
 ```
 {
-  "cwd": "C:\\Github-RMA\\Clients\\S24\\f7-core-test",
+  "cwd": "C:\\SourceCode\\f7-core-test",
   "type": [
     "web"
   ],
